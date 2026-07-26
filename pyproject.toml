@@ -21,3 +21,6 @@ build-backend = "hatchling.build"
 [tool.uv]
 managed = true
 package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["mealie_scripts"]
