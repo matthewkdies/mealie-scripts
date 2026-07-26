@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "mealie-macros"
 version = "0.1.0"
@@ -14,9 +18,8 @@ dependencies = [
 [project.scripts]
 mealie-scripts = "mealie_scripts.main:app"
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[dependency-groups]
+test = ["pytest>=9.1.1", "pytest-cov>=7.1.0", "pytest-randomly>=4.1.0"]
 
 [tool.uv]
 managed = true
