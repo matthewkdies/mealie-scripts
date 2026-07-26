@@ -6,6 +6,10 @@
 
 A CLI tool for interacting with and automating tasks on a [Mealie](https://mealie.io/) instance.
 
+## Roadmap
+
+This project is under active development. For more information, see the [roadmap](./ROADMAP.md).
+
 ## Features
 
 - **Recipes Management**: Automate tagging of recipes based on nutritional information (`check-macros`) or total time (`check-quick`).
