@@ -15,7 +15,7 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-@app.command(name="list")
+@app.command(name="list", help="Lists the caches available, whether they exist, and their descriptions.")
 def list_cache() -> None:
     table = Table(title="mealie-scripts Cache")
     table.add_column("Type", style="magenta")
@@ -31,7 +31,7 @@ def list_cache() -> None:
     console.print(table)
 
 
-@app.command(name="clear")
+@app.command(name="clear", help="Clears one or all CLI caches.")
 def clear_cache(
     cache: Annotated[str | None, typer.Argument(help="The cache to clear.")] = None,
     clear_all: Annotated[bool, typer.Option("--all", "-a", help="Whether to clear all cache files.")] = False,

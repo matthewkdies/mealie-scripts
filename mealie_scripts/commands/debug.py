@@ -16,12 +16,8 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-@app.command(name="show-config")
+@app.command(name="show-config", help="Shows the CLI's configuration from the settings.")
 def show_config():
-    """
-    Show the tool's configuration.
-    """
-
     table = Table(title="mealie-scripts Config")
     table.add_column("Name", style="magenta")
     table.add_column("Value", style="green")
@@ -32,7 +28,7 @@ def show_config():
     console.print(table)
 
 
-@app.command(name="test-connection")
+@app.command(name="test-connection", help="Tests the connection to the Mealie instance from the CLI's settings.")
 def test_connection():
     async def _test_connection():
         async with MealieClient() as client:
