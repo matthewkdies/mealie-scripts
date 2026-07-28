@@ -8,7 +8,7 @@ from rich.console import Console
 from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 
 from ..client import MealieClient
-from ..config import default_settings
+from ..config import settings
 from ..utils import load_cache, save_cache
 
 app = typer.Typer(no_args_is_help=True)
@@ -101,15 +101,15 @@ async def run_recipe_processor(
                 processed_cache.add(summary["id"])
                 save_cache(cache_key, processed_cache)
                 progress.advance(task)
-                await asyncio.sleep(default_settings.sleep_between_requests)
+                await asyncio.sleep(settings.sleep_between_requests)
 
 
 # --- Core Recipe Processors ---
 
 
 async def process_macros_for_recipe(client: MealieClient, recipe: dict[str, Any], system_tags: dict[str, Any]):
-    protein_tag = await get_or_create_tag(client, default_settings.protein_tag_name, system_tags)
-    fiber_tag = await get_or_create_tag(client, default_settings.fiber_tag_name, system_tags)
+    protein_tag = await get_or_create_tag(client, settings.protein_tag_name, system_tags)
+    fiber_tag = await get_or_create_tag(client, settings.fiber_tag_name, system_tags)
 
     nutrition = recipe.get("nutrition") or {}
     try:
@@ -122,14 +122,14 @@ async def process_macros_for_recipe(client: MealieClient, recipe: dict[str, Any]
     tag_payloads, existing_tag_names = extract_tag_payloads(recipe)
     needs_update = False
 
-    if protein >= default_settings.protein_threshold and default_settings.protein_tag_name not in existing_tag_names:
+    if protein >= settings.protein_threshold and settings.protein_tag_name not in existing_tag_names:
         tag_payloads.append(protein_tag)
-        existing_tag_names.add(default_settings.protein_tag_name)
+        existing_tag_names.add(settings.protein_tag_name)
         needs_update = True
 
-    if fiber >= default_settings.fiber_threshold and default_settings.fiber_tag_name not in existing_tag_names:
+    if fiber >= settings.fiber_threshold and settings.fiber_tag_name not in existing_tag_names:
         tag_payloads.append(fiber_tag)
-        existing_tag_names.add(default_settings.fiber_tag_name)
+        existing_tag_names.add(settings.fiber_tag_name)
         needs_update = True
 
     if needs_update:
@@ -137,15 +137,12 @@ async def process_macros_for_recipe(client: MealieClient, recipe: dict[str, Any]
 
 
 async def process_quick_for_recipe(client: MealieClient, recipe: dict[str, Any], system_tags: dict[str, Any]):
-    quick_tag = await get_or_create_tag(client, default_settings.quick_tag_name, system_tags)
+    quick_tag = await get_or_create_tag(client, settings.quick_tag_name, system_tags)
     minutes = parse_total_time_for_minutes(recipe.get("totalTime"))
 
     tag_payloads, existing_tag_names = extract_tag_payloads(recipe)
 
-    if (
-        0 < minutes <= default_settings.quick_threshold_minutes
-        and default_settings.quick_tag_name not in existing_tag_names
-    ):
+    if 0 < minutes <= settings.quick_threshold_minutes and settings.quick_tag_name not in existing_tag_names:
         tag_payloads.append(quick_tag)
         await client.update_recipe_tags(recipe["slug"], tag_payloads)
 
