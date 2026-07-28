@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, overload
 
 from pydantic import AfterValidator, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,6 +19,15 @@ def validate_config_dir(config_dir: Path) -> Path:
 
 
 class Settings(BaseSettings):
+    @overload
+    def __init__(self, *, api_key: str | SecretStr, **kwargs): ...
+
+    @overload
+    def __init__(self, **kwargs): ...
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     mealie_url: str = "https://mealie.fixme.dne"
     mealie_api_token: SecretStr = SecretStr("your_api_token_here")
 
