@@ -34,7 +34,7 @@ class MealieClient:
     async def fetch_all_tags(self) -> list[dict[str, Any]]:
         """Fetches all tags from Mealie."""
         url = "/api/organizers/tags"
-        params = {"page": 1, "perPage": 1000}
+        params = {"page": 1, "per_page": 1000}
         response = await self.client.get(url, params=params)
         response.raise_for_status()
         data = response.json()
@@ -48,7 +48,7 @@ class MealieClient:
 
         while True:
             url = "/api/recipes"
-            params = {"page": page, "perPage": per_page}
+            params = {"page": page, "per_page": per_page}
             response = await self.client.get(url, params=params)
             response.raise_for_status()
 
