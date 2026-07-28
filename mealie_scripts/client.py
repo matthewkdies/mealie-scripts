@@ -3,17 +3,20 @@ from typing import Any
 
 import httpx2
 
-from .config import settings
+from mealie_scripts.config import Settings, settings
 
 
 class MealieClient:
-    def __init__(self):
+    def __init__(self, settings: Settings = settings, client: httpx2.AsyncClient | None = None):
+        self.settings = settings
         self.base_url = settings.mealie_url.rstrip("/")
         self.headers = {
             "Authorization": f"Bearer {settings.mealie_api_token.get_secret_value()}",
             "Content-Type": "application/json",
         }
-        self.client = httpx2.AsyncClient(base_url=self.base_url, headers=self.headers, timeout=30.0)
+        self.client = (
+            client if client else httpx2.AsyncClient(base_url=self.base_url, headers=self.headers, timeout=30.0)
+        )
 
     async def __aenter__(self):
         return self
@@ -60,7 +63,7 @@ class MealieClient:
                 break
 
             page += 1
-            await asyncio.sleep(settings.sleep_between_requests)
+            await asyncio.sleep(self.settings.sleep_between_requests)
 
         return recipes
 
