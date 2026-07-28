@@ -56,15 +56,7 @@ hooks = [
 [[repos]]
 repo = "https://github.com/astral-sh/ty-pre-commit"
 rev = "v0.0.63"
-hooks = [
-    { id = "ty", pass_filenames = true, stages = [
-        "pre-push",
-    ], args = [
-        "--isolated",
-        "--no-python-downloads",
-        "--no-cache",
-    ] },
-]
+hooks = [{ id = "ty", stages = ["pre-push"], args = ["--no-python-downloads"] }]
 
 # -------------------------------------------------
 # pytest
