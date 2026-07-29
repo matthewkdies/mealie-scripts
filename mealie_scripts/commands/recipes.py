@@ -7,9 +7,9 @@ import typer
 from rich.console import Console
 from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 
-from ..client import MealieClient
-from ..config import settings
-from ..utils import load_cache, save_cache
+from mealie_scripts.cache import CacheManager, CacheType
+from mealie_scripts.client import MealieClient
+from mealie_scripts.config import settings
 
 app = typer.Typer(no_args_is_help=True)
 console = Console()
@@ -59,12 +59,13 @@ def extract_tag_payloads(recipe: dict[str, Any]) -> tuple[list[dict[str, Any]], 
 
 
 async def run_recipe_processor(
-    cache_key: str,
+    cache_type: CacheType,
     force: bool,
     process_single_recipe: Callable[[MealieClient, dict[str, Any], dict[str, Any]], Any],
 ):
     """Generic runner that handles client connection, cache, and progress bar UI."""
-    processed_cache = load_cache(cache_key) if not force else set()
+    cache_manager = CacheManager(settings.sqlite_file)
+    processed_cache = cache_manager.load_cache(cache_type.value) if not force else set()
 
     async with MealieClient() as client:
         console.print("[bold blue]Fetching system tags...[/bold blue]")
@@ -99,7 +100,7 @@ async def run_recipe_processor(
                     await process_single_recipe(client, recipe, system_tags)
 
                 processed_cache.add(summary["id"])
-                save_cache(cache_key, processed_cache)
+                cache_manager.add_to_cache(cache_type.value, processed_cache)
                 progress.advance(task)
                 await asyncio.sleep(settings.sleep_between_requests)
 
@@ -153,10 +154,10 @@ async def process_quick_for_recipe(client: MealieClient, recipe: dict[str, Any],
 @app.command(name="check-macros")
 def check_macros(force: bool = typer.Option(False, "--force", "-f", help="Ignore cache and check all recipes.")):
     """Check all recipes for protein and fiber thresholds and apply tags."""
-    asyncio.run(run_recipe_processor("macros", force, process_macros_for_recipe))
+    asyncio.run(run_recipe_processor(CacheType.MACROS, force, process_macros_for_recipe))
 
 
 @app.command(name="check-quick")
 def check_quick(force: bool = typer.Option(False, "--force", "-f", help="Ignore cache and check all recipes.")):
     """Check all recipes for totalTime threshold and apply the quick tag."""
-    asyncio.run(run_recipe_processor("quick", force, process_quick_for_recipe))
+    asyncio.run(run_recipe_processor(CacheType.QUICK, force, process_quick_for_recipe))

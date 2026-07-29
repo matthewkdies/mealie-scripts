@@ -1,21 +1,11 @@
 import logging
 from pathlib import Path
-from typing import Annotated, overload
+from typing import overload
 
-from pydantic import AfterValidator, SecretStr
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 logger = logging.getLogger(__name__)
-
-
-def validate_config_dir(config_dir: Path) -> Path:
-    config_dir = config_dir.expanduser()
-
-    if not config_dir.is_dir():
-        logger.info("Config dir at '%s' does not exist. Attempting to create.", config_dir)
-        config_dir.mkdir(parents=False, exist_ok=False)
-
-    return config_dir
 
 
 class Settings(BaseSettings):
@@ -41,16 +31,13 @@ class Settings(BaseSettings):
     fiber_tag_name: str = "High fiber"
     quick_tag_name: str = "Quick"
 
-    # persistent storage
-    config_dir: Annotated[Path, AfterValidator(validate_config_dir)] = Path.home() / ".config/mealie_scripts"
+    # sqlite storage
+    sqlite_file: Path = Path.home() / ".config/mealie_scripts/mealie_scripts.db"
 
     # Rate Limiting
     sleep_between_requests: float = 1.5
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="MEALIE_SCRIPTS_")
-
-    def get_cache_file(self, command_name: str) -> Path:
-        return self.config_dir / f"{command_name}.json"
 
 
 settings = Settings()
