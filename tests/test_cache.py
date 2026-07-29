@@ -5,8 +5,6 @@ from mealie_scripts.config import Settings
 def test_cache_manager_init(cache_manager: CacheManager, mock_settings: Settings):
     """Ensure the database file and table are created on initialization."""
     assert mock_settings.sqlite_file.exists()
-    # A basic check to see if the table was created.
-    # This could be more robust by inspecting the db schema.
     assert cache_manager.get_cache_counts() == {CacheType.MACROS: 0, CacheType.QUICK: 0}
 
 
