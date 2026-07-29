@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import httpx2
@@ -9,11 +10,12 @@ from mealie_scripts.config import Settings
 
 
 @pytest.fixture
-def mock_settings() -> Settings:
+def mock_settings(tmp_path: Path) -> Settings:
     return Settings(
         mealie_url="http://test-mealie.dne",
         mealie_api_token=SecretStr("test-token"),
         sleep_between_requests=0,
+        sqlite_file=tmp_path / "test.db",
     )
 
 
