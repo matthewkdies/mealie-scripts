@@ -43,27 +43,27 @@ class CacheManager:
         """Create tables if they don't already exist."""
         Base.metadata.create_all(self.engine)
 
-    def is_cached(self, cache_type: str, recipe_id: str) -> bool:
+    def is_cached(self, cache_type: CacheType, recipe_id: str) -> bool:
         """Check if a single recipe has already been processed."""
         stmt = select(ProcessedRecipe).where(
-            ProcessedRecipe.cache_type == cache_type,
+            ProcessedRecipe.cache_type.name == cache_type,
             ProcessedRecipe.recipe_id == recipe_id,
         )
         with Session(self.engine) as session:
             return session.scalar(stmt) is not None
 
-    def load_cache(self, cache_type: str) -> set[str]:
+    def load_cache(self, cache_type: CacheType) -> set[str]:
         """Fetch all cached recipe IDs for a given cache."""
-        stmt = select(ProcessedRecipe.recipe_id).where(ProcessedRecipe.cache_type == cache_type)
+        stmt = select(ProcessedRecipe.recipe_id).where(ProcessedRecipe.cache_type.name == cache_type)
         with Session(self.engine) as session:
             return set(session.scalars(stmt).all())
 
-    def add_to_cache(self, cache_type: str, recipe_ids: set[str] | list[str]) -> None:
+    def add_to_cache(self, cache_type: CacheType, recipe_ids: set[str] | list[str]) -> None:
         """Atomically insert new recipe IDs into the cache, ignoring duplicates."""
         if not recipe_ids:
             return
 
-        values = [{"cache_type": cache_type, "recipe_id": r_id} for r_id in recipe_ids]
+        values = [{"cache_type": cache_type.name, "recipe_id": r_id} for r_id in recipe_ids]
         stmt = insert(ProcessedRecipe).values(values).on_conflict_do_nothing()
 
         with Session(self.engine) as session:

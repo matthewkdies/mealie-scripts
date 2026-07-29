@@ -100,7 +100,7 @@ async def run_recipe_processor(
                     await process_single_recipe(client, recipe, system_tags)
 
                 processed_cache.add(summary["id"])
-                cache_manager.add_to_cache(cache_type.name, processed_cache)
+                cache_manager.add_to_cache(cache_type, processed_cache)
                 progress.advance(task)
                 await asyncio.sleep(settings.sleep_between_requests)
 
