@@ -46,7 +46,7 @@ class CacheManager:
     def is_cached(self, cache_type: CacheType, recipe_id: str) -> bool:
         """Check if a single recipe has already been processed."""
         stmt = select(ProcessedRecipe).where(
-            ProcessedRecipe.cache_type.name == cache_type,
+            ProcessedRecipe.cache_type == cache_type.name,
             ProcessedRecipe.recipe_id == recipe_id,
         )
         with Session(self.engine) as session:
@@ -54,7 +54,7 @@ class CacheManager:
 
     def load_cache(self, cache_type: CacheType) -> set[str]:
         """Fetch all cached recipe IDs for a given cache."""
-        stmt = select(ProcessedRecipe.recipe_id).where(ProcessedRecipe.cache_type.name == cache_type)
+        stmt = select(ProcessedRecipe.recipe_id).where(ProcessedRecipe.cache_type == cache_type.name)
         with Session(self.engine) as session:
             return set(session.scalars(stmt).all())
 
@@ -96,7 +96,7 @@ class CacheManager:
             The number of rows deleted.
         """
         if cache_type:
-            stmt = delete(ProcessedRecipe).where(ProcessedRecipe.cache_type == cache_type)
+            stmt = delete(ProcessedRecipe).where(ProcessedRecipe.cache_type == cache_type.name)
         else:
             stmt = delete(ProcessedRecipe)
 
