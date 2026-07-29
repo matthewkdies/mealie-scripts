@@ -5,6 +5,7 @@ import httpx2
 import pytest
 from pydantic import SecretStr
 
+from mealie_scripts.cache import CacheManager
 from mealie_scripts.client import MealieClient
 from mealie_scripts.config import Settings
 
@@ -29,3 +30,9 @@ def mealie_client(mock_settings: Settings, mock_httpx_client: MagicMock) -> Meal
     with patch("mealie_scripts.client.httpx2.AsyncClient", return_value=mock_httpx_client):
         client = MealieClient(mock_settings, mock_httpx_client)
         return client
+
+
+@pytest.fixture
+def cache_manager(mock_settings: Settings) -> CacheManager:
+    """Returns a CacheManager instance with a temporary db path."""
+    return CacheManager(mock_settings.sqlite_file)
