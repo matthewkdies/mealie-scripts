@@ -8,5 +8,10 @@
         "**/.venv": true,
         "**/.ruff_cache": true,
         "**/__pycache__": true
-    }
+    },
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
