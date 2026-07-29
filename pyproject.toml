@@ -29,6 +29,7 @@ test = [
 [tool.uv]
 managed = true
 package = true
+default-groups = ["test"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["mealie_scripts"]
