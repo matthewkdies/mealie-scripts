@@ -36,3 +36,12 @@ def mealie_client(mock_settings: Settings, mock_httpx_client: MagicMock) -> Meal
 def cache_manager(mock_settings: Settings) -> CacheManager:
     """Returns a CacheManager instance with a temporary db path."""
     return CacheManager(mock_settings.sqlite_file)
+
+
+# TODO: can't figure out how to get env vars up at runtime for the CLI invocation
+@pytest.fixture(autouse=True)
+def mock_env(monkeypatch: pytest.MonkeyPatch, mock_settings: Settings):
+    """Mock environment variables for settings."""
+    for setting_name, setting_val in mock_settings:
+        monkeypatch.setenv(f"MEALIE_SCRIPTS_{setting_name.upper()}", str(setting_val))
+    return mock_settings
