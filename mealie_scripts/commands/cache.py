@@ -5,6 +5,7 @@ from typing import Annotated
 import typer
 from rich import print
 from rich.console import Console
+from rich.prompt import Prompt
 from rich.table import Table
 
 from mealie_scripts.cache import CACHE_DESCRIPTIONS, CacheManager, CacheType
@@ -64,7 +65,10 @@ def clear_cache(
         raise typer.Exit(1)
 
     if not force:
-        typer.confirm(f"Clear the [magenta]{cache.value}[/magenta] cache?", abort=True)
+        clear = Prompt.ask(f"Clear the [magenta]{cache.value}[/magenta] cache? [Y/n]").strip().lower() == "y"
+        if not clear:
+            print("Not clearing the cache.")
+            raise typer.Abort()
 
     cleared_count = cache_manager.clear_cache(cache)
 
