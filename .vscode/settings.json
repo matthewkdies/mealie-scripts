@@ -7,7 +7,9 @@
         "**/Thumbs.db": true,
         "**/.venv": true,
         "**/.ruff_cache": true,
-        "**/__pycache__": true
+        "**/__pycache__": true,
+        "**/htmlcov": true,
+        "**/.coverage": true
     },
     "python.testing.pytestArgs": [
         "tests"
