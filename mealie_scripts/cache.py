@@ -3,7 +3,7 @@ from enum import Enum
 from pathlib import Path
 
 from sqlalchemy import Enum as SQLAlchemyEnum
-from sqlalchemy import String, create_engine, delete, select
+from sqlalchemy import String, create_engine, delete, func, select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
 
@@ -72,12 +72,17 @@ class CacheManager:
 
     def get_cache_counts(self) -> dict[CacheType, int]:
         """Return a dict of each cache type and the number of entries."""
-        counts = {}
+
+        counts = {cache_type: 0 for cache_type in CacheType}
+
+        stmt = select(ProcessedRecipe.cache_type, func.count(ProcessedRecipe.recipe_id)).group_by(
+            ProcessedRecipe.cache_type
+        )
+
         with Session(self.engine) as session:
-            for cache_type in CacheType:
-                stmt = select(ProcessedRecipe).where(ProcessedRecipe.cache_type == cache_type)
-                count = len(session.scalars(stmt).all())
-                counts[cache_type] = count
+            for cache_type, count in session.execute(stmt):
+                counts[CacheType(cache_type)] = count
+
         return counts
 
     def clear_cache(self, cache_type: CacheType | None = None) -> int:

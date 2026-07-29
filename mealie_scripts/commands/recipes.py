@@ -65,7 +65,7 @@ async def run_recipe_processor(
 ):
     """Generic runner that handles client connection, cache, and progress bar UI."""
     cache_manager = CacheManager(settings.sqlite_file)
-    processed_cache = cache_manager.load_cache(cache_type.value) if not force else set()
+    processed_cache = cache_manager.load_cache(cache_type.name) if not force else set()
 
     async with MealieClient() as client:
         console.print("[bold blue]Fetching system tags...[/bold blue]")
@@ -100,7 +100,7 @@ async def run_recipe_processor(
                     await process_single_recipe(client, recipe, system_tags)
 
                 processed_cache.add(summary["id"])
-                cache_manager.add_to_cache(cache_type.value, processed_cache)
+                cache_manager.add_to_cache(cache_type.name, processed_cache)
                 progress.advance(task)
                 await asyncio.sleep(settings.sleep_between_requests)
 
